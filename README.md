@@ -1,2 +1,2 @@
-# mofron-parts-dialog
+# mofron-comp-dialog
 dialog component of mofron
