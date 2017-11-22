@@ -1,0 +1,22 @@
+{
+  "name": "mofron-comp-dialog",
+  "version": "0.0.1",
+  "description": "dialog component for mofron",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mofron/mofron-comp-dialog.git"
+  },
+  "keywords": [
+    "front-end"
+  ],
+  "author": "simparts",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/mofron/mofron-comp-dialog/issues"
+  },
+  "homepage": "https://github.com/mofron/mofron-comp-dialog#readme"
+}
