@@ -11,6 +11,7 @@ let Text = require('mofron-comp-text');
 let Button = require('mofron-comp-button');
 /* event */
 let Click = require('mofron-event-click');
+
 /* effect */
 let efCenter = require('mofron-effect-center');
 
@@ -48,6 +49,7 @@ mf.comp.Dialog = class extends mf.Component {
             let header = new Header({
                 title    : prm,
                 height   : 30,
+                bind     : false,
                 addChild : new Text({
                     style : {
                         'margin-left'  : 'auto',
@@ -97,7 +99,7 @@ mf.comp.Dialog = class extends mf.Component {
     
     title (prm) {
         try {
-            let hdr = this.child()[0].child()[0].child()[0];
+            let hdr = this.getFrame().child()[0];
             if (undefined === prm) {
                 /* getter */
                 return (1 === hdr.title().length) ? hdr.title()[0] : hdr.title();
@@ -114,8 +116,7 @@ mf.comp.Dialog = class extends mf.Component {
         try {
             if (undefined === prm) {
                 /* getter */
-                //        modalfil ->  frame   -> button  -> contents
-                return this.child()[0].child()[0].child()[1].child();
+                return this.getFrame().child()[1].child();
             }
             /* setter */
             if (true === Array.isArray(prm)) {
@@ -159,7 +160,7 @@ mf.comp.Dialog = class extends mf.Component {
                 },
                 this
             );
-            let btn_wrp = this.child()[0].child()[0].child()[1];
+            let btn_wrp = this.getFrame().child()[1];
             btn_wrp.addChild(set_val);
             
             /* centering */
@@ -181,19 +182,23 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
-    //width (prm) {
-    //    try {
-    //        if (undefined !== prm) {
-    //            /* setter */
-    //            let btn_wrp = this.child()[0].child()[0].child()[1];
-    //            btn_wrp.width(prm);
-    //        }
-    //        return super.width(prm);
-    //    } catch (e) {
-    //        console.error(e.stack);
-    //        throw e;
-    //    }
-    //}
+    getFrame () {
+        try {
+            return this.getChild(true)[0].child()[0];
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    getHeader () {
+        try {
+            return this.getFrame().child()[0];
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }   
 }
 module.exports = mofron.comp.Dialog;
 /* end of file */
