@@ -116,7 +116,8 @@ mf.comp.Dialog = class extends mf.Component {
         try {
             if (undefined === prm) {
                 /* getter */
-                return this.getFrame().child()[1].child();
+                let ret_btn = this.getFrame().child()[1].child();
+                return (0 === ret_btn.length) ? null : ret_btn;
             }
             /* setter */
             if (true === Array.isArray(prm)) {
@@ -143,7 +144,7 @@ mf.comp.Dialog = class extends mf.Component {
                 throw new Error('invalid parameter');
             }
             
-            if (0 < this.button().length) {
+            if (null !== this.button()) {
                 /* set offset */
                 set_val.style({ 'margin-left' : '15px' });
             }
@@ -164,7 +165,7 @@ mf.comp.Dialog = class extends mf.Component {
             btn_wrp.addChild(set_val);
             
             /* centering */
-            let btn_lst = this.button();
+            let btn_lst = (null === this.button()) ? [] : this.button();
             let wid     = 0;
             for (let bidx in btn_lst) {
                 wid += btn_lst[bidx].width();
