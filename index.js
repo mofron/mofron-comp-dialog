@@ -153,7 +153,20 @@ mf.comp.Dialog = class extends mf.Component {
             set_val.clickEvent(
                 (tgt, dlg) => {
                     try {
-                        dlg.visible(false);
+                        let btn_evt = dlg.buttonEvent();
+                        let btn_lst = dlg.button();
+                        /* call button event */
+                        if (null !== btn_evt) {
+                            for (let bidx in btn_lst) {
+                                if (tgt.getId() === btn_lst[bidx].getId()) {
+                                    btn_evt[0](bidx, btn_evt[1]);
+                                }
+                            }
+                        }
+                        /* close dialog */
+                        if (true === dlg.autoClose()) {
+                            dlg.visible(false);
+                        }
                     } catch (e) {
                         console.error(e.stack);
                         throw e;
@@ -177,6 +190,40 @@ mf.comp.Dialog = class extends mf.Component {
                 return;
             }
             btn_wrp.width(wid);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    buttonEvent (fnc, prm) {
+        try {
+            if (undefined === fnc) {
+                /* getter */ 
+                return (undefined === this.m_btnevt) ? null : this.m_btnevt;
+            }
+            /* setter */
+            if ('function' !== typeof fnc) {
+                throw new Error('invalid parameter');
+            }
+            this.m_btnevt = new Array(fnc, prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    autoClose (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                return (undefined === this.m_atclose) ? true : this.m_atclose;
+            }
+            /* setter */
+            if ('boolean' !== typeof prm) {
+                throw new Error('invalid parameter');
+            }
+            this.m_atclose = prm;
         } catch (e) {
             console.error(e.stack);
             throw e;
