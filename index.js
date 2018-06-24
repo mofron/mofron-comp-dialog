@@ -246,6 +246,19 @@ mf.comp.Dialog = class extends mf.Component {
             console.error(e.stack);
             throw e;
         }
+    }
+    
+    color (prm, cnt) {
+        try {
+            if (undefined !== cnt) {
+                /* contents color setter */
+                super.color(cnt);
+            }
+            return this.getHeader().color(prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
     }   
 }
 module.exports = mofron.comp.Dialog;
