@@ -83,7 +83,12 @@ mf.comp.Dialog = class extends mf.Component {
             let frame = new Frame({
                 color     : new mf.Color(255,255,255),
                 addEffect : new efCenter(),
-                child     : [ header, button ]
+                child     : [
+                    header,
+                    new mf.Component({
+                        addChild : button
+                    })
+                ]
             });
             
             this.addChild(new Modal({ addChild : frame }));
