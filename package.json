@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-dialog",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "dialog component for mofron",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,10 @@
   },
   "dependencies": {
     "mofron-comp-modalfil" : "",
-    "mofron-comp-ttlhdr"   : "",
-    "mofron-event-click"   : "",
-    "mofron-effect-center" : ""
+    "mofron-comp-appheader" : "",
+    "mofron-event-visiswh" : "",
+    "mofron-effect-hrzpos" : "",
+    "mofron-effect-vrtpos" : ""
   },
   "repository": {
     "type": "git",

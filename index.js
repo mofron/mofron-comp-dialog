@@ -3,17 +3,15 @@
  * @brief dialog component for mofron
  * @author simpart
  */
-let mf = require('mofron');
-let Modal = require('mofron-comp-modalfil');
-let Frame = require('mofron-comp-frame');
-let Header = require('mofron-comp-ttlhdr');
-let Text = require('mofron-comp-text');
-let Button = require('mofron-comp-button');
-/* event */
-let Click = require('mofron-event-click');
-
-/* effect */
-let efCenter = require('mofron-effect-center');
+const mf     = require('mofron');
+const Modal  = require('mofron-comp-modalfil');
+const Frame  = require('mofron-comp-frame');
+const Header = require('mofron-comp-appheader');
+const Text   = require('mofron-comp-text');
+const Button = require('mofron-comp-button');
+const Click  = require('mofron-event-visiswh');
+const HrzPos = require('mofron-effect-hrzpos'); 
+const VrtPos = require('mofron-effect-vrtpos');
 
 /**
  * @class mofron.comp.Dialog
@@ -30,6 +28,7 @@ mf.comp.Dialog = class extends mf.Component {
         try {
             super();
             this.name('Dialog');
+            this.prmMap('title');
             this.prmOpt(po);
         } catch (e) {
             console.error(e.stack);
@@ -42,47 +41,29 @@ mf.comp.Dialog = class extends mf.Component {
      * 
      * @param prm : 
      */
-    initDomConts (prm) {
+    initDomConts () {
         try {
             super.initDomConts(); 
             
             let header = new Header({
-                title    : prm,
-                height   : 30,
+                height   : 0.4,
                 bind     : false,
-                addChild : new Text({
-                    style : {
-                        'margin-left'  : 'auto',
-                        'margin-right' : '10px'
-                    },  
-                    text     : '&#x2715;',
-                    addEvent : new Click(
-                        (tgt, dlg) => {
-                            try {
-                                dlg.visible(false);
-                            } catch (e) {
-                                console.error(e.stack);
-                                throw e;
-                            }
-                        },
-                        this
-                    )
+                navigate : new Text({
+                    text  : '&#x2715;',
+                    event : [ new Click('disable', this) ]
                 })
             });
             
             let button = new mf.Component({
                 style : {
                     'position' : 'absolute',
-                    'bottom'   : '15px'
+                    'bottom'   : '0.15rem'
                 },
-                addEffect : new efCenter({
-                    enableFlag : new mf.Param(true,false),
-                    posiType   : 'absolute'
-                })
+                effect : [ new HrzPos('center') ]
             });
             let frame = new Frame({
-                color     : new mf.Color(255,255,255),
-                addEffect : new efCenter(),
+                mainColor : new mf.Color(255,255,255),
+                effect    : [ new HrzPos('center'), new VrtPos('center') ],
                 child     : [
                     header,
                     new mf.Component({
@@ -95,7 +76,7 @@ mf.comp.Dialog = class extends mf.Component {
             this.target(frame.target());
             
             /* default size */
-            this.size(380, 230);
+            this.size(3.8, 2.3);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -107,10 +88,10 @@ mf.comp.Dialog = class extends mf.Component {
             let hdr = this.getFrame().child()[0];
             if (undefined === prm) {
                 /* getter */
-                return (1 === hdr.title().length) ? hdr.title()[0] : hdr.title();
+                return (1 === hdr.text().length) ? hdr.text()[0] : hdr.text();
             }
             /* setter */
-            hdr.title(prm);
+            hdr.text(prm, true);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -151,9 +132,9 @@ mf.comp.Dialog = class extends mf.Component {
             
             if (null !== this.button()) {
                 /* set offset */
-                set_val.style({ 'margin-left' : '15px' });
+                set_val.style({ 'margin-left' : '0.15rem' });
             }
-            set_val.width(100);
+            set_val.width(1);
             set_val.clickEvent(cb, cbp);
             set_val.clickEvent(
                 (tgt, dlg) => {
@@ -188,7 +169,7 @@ mf.comp.Dialog = class extends mf.Component {
             for (let bidx in btn_lst) {
                 wid += btn_lst[bidx].width();
                 /* add offset */
-                wid += (0 == bidx) ? 0 : 15; 
+                wid += (0 == bidx) ? 0 : 0.15; 
             }
             if ('number' !== typeof wid) {
                 /* could not centering buttons */
@@ -253,18 +234,6 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
-    color (prm, cnt) {
-        try {
-            if (undefined !== cnt) {
-                /* contents color setter */
-                super.color(cnt);
-            }
-            return this.getHeader().color(prm);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }   
 }
 module.exports = mofron.comp.Dialog;
 /* end of file */
