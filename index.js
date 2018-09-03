@@ -46,7 +46,7 @@ mf.comp.Dialog = class extends mf.Component {
             super.initDomConts(); 
             
             let header = new Header({
-                height   : 0.4,
+                height   : '0.42rem',
                 bind     : false,
                 navigate : new Text({
                     text  : '&#x2715;',
@@ -76,7 +76,7 @@ mf.comp.Dialog = class extends mf.Component {
             this.target(frame.target());
             
             /* default size */
-            this.size(3.8, 2.3);
+            this.size('3.8rem', '2.3rem');
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -91,7 +91,7 @@ mf.comp.Dialog = class extends mf.Component {
                 return (1 === hdr.text().length) ? hdr.text()[0] : hdr.text();
             }
             /* setter */
-            hdr.text(prm, true);
+            hdr.text(prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -167,7 +167,7 @@ mf.comp.Dialog = class extends mf.Component {
             let btn_lst = (null === this.button()) ? [] : this.button();
             let wid     = 0;
             for (let bidx in btn_lst) {
-                wid += btn_lst[bidx].width();
+                wid += btn_lst[bidx].width().value();
                 /* add offset */
                 wid += (0 == bidx) ? 0 : 0.15; 
             }
@@ -175,7 +175,7 @@ mf.comp.Dialog = class extends mf.Component {
                 /* could not centering buttons */
                 return;
             }
-            btn_wrp.width(wid);
+            btn_wrp.width(wid+'rem');
         } catch (e) {
             console.error(e.stack);
             throw e;
