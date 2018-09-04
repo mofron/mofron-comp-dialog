@@ -3,15 +3,15 @@
  * @brief dialog component for mofron
  * @author simpart
  */
-const mf     = require('mofron');
-const Modal  = require('mofron-comp-modalfil');
-const Frame  = require('mofron-comp-frame');
-const Header = require('mofron-comp-appheader');
-const Text   = require('mofron-comp-text');
-const Button = require('mofron-comp-button');
-const Click  = require('mofron-event-visiswh');
-const HrzPos = require('mofron-effect-hrzpos'); 
-const VrtPos = require('mofron-effect-vrtpos');
+const mf      = require('mofron');
+const Modal   = require('mofron-comp-modalfil');
+const Frame   = require('mofron-comp-frame');
+const Header  = require('mofron-comp-appheader');
+const Text    = require('mofron-comp-text');
+const Button  = require('mofron-comp-button');
+const HrzPos  = require('mofron-effect-hrzpos'); 
+const VrtPos  = require('mofron-effect-vrtpos');
+const VisiSwh = require('mofron-event-visiswh');
 
 /**
  * @class mofron.comp.Dialog
@@ -45,16 +45,7 @@ mf.comp.Dialog = class extends mf.Component {
         try {
             super.initDomConts(); 
             
-            let header = new Header({
-                height   : '0.42rem',
-                bind     : false,
-                navigate : new Text({
-                    text  : '&#x2715;',
-                    event : [ new Click('disable', this) ]
-                })
-            });
-            
-            let button = new mf.Component({
+            let btn_ara = new mf.Component({
                 width : '0rem',
                 style : {
                     'position' : 'absolute',
@@ -62,22 +53,25 @@ mf.comp.Dialog = class extends mf.Component {
                 },
                 effect : [ new HrzPos('center') ]
             });
-            let frame = new Frame({
-                mainColor : new mf.Color(255,255,255),
-                effect    : [ new HrzPos('center'), new VrtPos('center') ],
-                child     : [
-                    header,
-                    new mf.Component({
-                        width    : '100%',
-                        addChild : button
-                    })
+            this.contents().addChild(btn_ara);
+            this.btnTgt(btn_ara.target());
+            
+            let frame = this.frame();
+            frame.execOption({
+                child : [
+                    this.header(),
+                    this.contents()
                 ]
             });
             
-            this.addChild(new Modal({ addChild : frame }));
-            this.target(frame.target());
+            this.modalfil().execOption({
+                child : [ frame ]
+            });
             
-
+            this.addChild(this.modalfil());
+            this.target(this.contents().target());
+            this.styleTgt(this.frame().target());
+            
             /* default size */
             this.size('3.8rem', '2.3rem');
         } catch (e) {
@@ -88,13 +82,12 @@ mf.comp.Dialog = class extends mf.Component {
     
     title (prm) {
         try {
-            let hdr = this.getFrame().child()[0];
             if (undefined === prm) {
                 /* getter */
-                return (1 === hdr.text().length) ? hdr.text()[0] : hdr.text();
+                return (1 === this.header().text().length) ? this.header().text()[0] : this.header().text();
             }
             /* setter */
-            hdr.text(prm);
+            this.header().text(prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -118,37 +111,42 @@ mf.comp.Dialog = class extends mf.Component {
                 throw new Error('invalid parameter');
             }
             
-            let thisobj = this;
             prm.execOption({
                 size       : new mf.Param('1rem', '0.3rem'),
                 sizeValue  : new mf.Param(
-                    'margin-left',
-                    (0 !== this.button().length) ? '0.3rem' : '0rem'
-                ),
-                clickEvent : new mf.Param(
-                    (tgt, dlg) => {
-                        try {
-                            if (true === dlg.autoClose()) { dlg.visible(false); }
-                        } catch (e) {
-                            console.log(e.stack);
-                            throw e;
-                        }
-                    },
-                    thisobj
-                )
+                                 'margin-left',
+                                 (0 !== this.button().length) ? '0.3rem' : '0rem'
+                             )
             });
-            
-            let btn_wrp = this.getFrame().child()[1].child()[0];
-            btn_wrp.width(
-                mf.func.sizeSum(btn_wrp.width(), prm.width())
-            );
-            if (0 !== this.button().length) {
-                btn_wrp.width(
-                    mf.func.sizeSum(btn_wrp.width(), '0.3rem')
-                );
+            if (true === this.autoClose()) {
+                prm.execOption({
+                    event : [ new VisiSwh('disable', this) ]
+                });
             }
             
-            btn_wrp.addChild(prm);
+            
+            this.switchTgt(
+                this.btnTgt(),
+                (cmp) => {
+                    try {
+                        let btn_wid = mf.func.getSizeObj(cmp.target().style('width'));
+                        cmp.target().style({
+                            width : mf.func.sizeSum(btn_wid, prm.width()).toString()
+                        });
+                        
+                        if (0 !== cmp.button().length) {
+                            cmp.target().style({
+                                width : mf.func.sizeSum(cmp.target().style('width'),'0.3rem').toString()
+                            });
+                        }
+                        
+                        cmp.addChild(prm);
+                    } catch (e) {
+                        console.error(e.stack);
+                        throw e;
+                    }
+                }
+            );
             
             if (undefined === this.m_button) {
                 this.m_button = [];
@@ -177,19 +175,128 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
-    getFrame () {
+    frame (prm) {
         try {
-            return this.getChild(true)[0].child()[0];
+            if (undefined === prm) {
+                /* getter */
+                if (undefined === this.m_frame) {
+                    this.frame(
+                        new Frame({
+                            mainColor : new mf.Color(255,255,255),
+                            effect    : [ new HrzPos('center'), new VrtPos('center') ],
+                        })
+                    );
+                }
+                return this.m_frame;
+            }
+            /* setter */
+            if (true !== mf.func.isInclude(prm, 'Frame')) {
+                throw new Error('invalid parameter');
+            }
+            this.m_frame = prm;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    getHeader () {
+    header (prm) {
         try {
-            return this.getFrame().child()[0];
+            if (undefined === prm) {
+                /* getter */
+                if (undefined === this.m_header) {
+                    this.header(
+                        new Header({
+                            height   : '0.42rem',
+                            bind     : false,
+                            navigate : new Text({
+                                text  : '&#x2715;',
+                                event : [ new VisiSwh('disable', this) ]
+                            })
+                        })
+                    );
+                }
+                return this.m_header;
+            }
+            /* setter */
+            if (true !== mf.func.isInclude(prm, 'Header')) {
+                throw new Error('invalid parameter');
+            }
+            this.m_header = prm;
         } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    modalfil (prm) {
+       try {
+           if (undefined === prm) {
+               /* getter */
+               if (undefined === this.m_mdlfil) {
+                   this.modalfil(new Modal({}));
+               }
+               return this.m_mdlfil;
+           } 
+           /* setter */
+           if (true !== mf.func.isInclude(prm, 'ModalFil')) {
+               throw new Error('invalid parameter');
+           }
+           this.m_mdlfil = prm;
+       } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    contents (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                if (undefined === this.m_conts) {
+                    this.contents(new mf.Component({ width : '100%' }));
+                }
+                return this.m_conts;
+            }
+            /* setter */
+            if (true !== mf.func.isInclude(prm, 'Component')) {
+                throw new Error('invalid parameter');
+            }
+            this.m_conts = prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    btnTgt (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                if (undefined === this.m_btntgt) {
+                    throw new Error('not find target');
+                }
+                return this.m_btntgt;
+            }
+            /* setter */
+            if (true !== mf.func.isInclude(prm, 'Dom')) {
+            }
+            this.m_btntgt = prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    mainColor (prm) {
+        try { return this.header().baseColor(prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    accentColor (prm) {
+        try { return this.modalfil().baseColor(prm); } catch (e) {
             console.error(e.stack);
             throw e;
         }
