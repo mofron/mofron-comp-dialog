@@ -55,9 +55,10 @@ mf.comp.Dialog = class extends mf.Component {
             });
             
             let button = new mf.Component({
+                width : '0rem',
                 style : {
                     'position' : 'absolute',
-                    'bottom'   : '0.15rem'
+                    'bottom'   : '0.2rem'
                 },
                 effect : [ new HrzPos('center') ]
             });
@@ -67,6 +68,7 @@ mf.comp.Dialog = class extends mf.Component {
                 child     : [
                     header,
                     new mf.Component({
+                        width    : '100%',
                         addChild : button
                     })
                 ]
@@ -75,6 +77,7 @@ mf.comp.Dialog = class extends mf.Component {
             this.addChild(new Modal({ addChild : frame }));
             this.target(frame.target());
             
+
             /* default size */
             this.size('3.8rem', '2.3rem');
         } catch (e) {
@@ -98,101 +101,59 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
-    button (prm, cb, cbp) {
+    button (prm) {
         try {
             if (undefined === prm) {
                 /* getter */
-                let ret_btn = this.getFrame().child()[1].child();
-                return (0 === ret_btn.length) ? null : ret_btn;
+                return (undefined === this.m_button) ? [] : this.m_button;
             }
             /* setter */
             if (true === Array.isArray(prm)) {
                 for (let pidx in prm) {
-                    this.addButton(prm[pidx], cb, cbp);
+                    this.button(prm[pidx]);
                 }
-            } else {
-                this.addButton(prm, cb, cbp);
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    addButton (prm, cb, cbp) {
-        try {
-            let set_val = null;
-            if ('string' === typeof prm) {
-                set_val = new Button(prm);
-            } else if (true === mf.func.isInclude(prm, 'Button')) {
-                set_val = prm;
-            } else {
-                throw new Error('invalid parameter');
-            }
-            
-            if (null !== this.button()) {
-                /* set offset */
-                set_val.style({ 'margin-left' : '0.15rem' });
-            }
-            set_val.width(1);
-            set_val.clickEvent(cb, cbp);
-            set_val.clickEvent(
-                (tgt, dlg) => {
-                    try {
-                        let btn_evt = dlg.buttonEvent();
-                        let btn_lst = dlg.button();
-                        /* call button event */
-                        if (null !== btn_evt) {
-                            for (let bidx in btn_lst) {
-                                if (tgt.getId() === btn_lst[bidx].getId()) {
-                                    btn_evt[0](bidx, btn_evt[1]);
-                                }
-                            }
-                        }
-                        /* close dialog */
-                        if (true === dlg.autoClose()) {
-                            dlg.visible(false);
-                        }
-                    } catch (e) {
-                        console.error(e.stack);
-                        throw e;
-                    }
-                },
-                this
-            );
-            let btn_wrp = this.getFrame().child()[1];
-            btn_wrp.addChild(set_val);
-            
-            /* centering */
-            let btn_lst = (null === this.button()) ? [] : this.button();
-            let wid     = 0;
-            for (let bidx in btn_lst) {
-                wid += btn_lst[bidx].width().value();
-                /* add offset */
-                wid += (0 == bidx) ? 0 : 0.15; 
-            }
-            if ('number' !== typeof wid) {
-                /* could not centering buttons */
                 return;
             }
-            btn_wrp.width(wid+'rem');
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    buttonEvent (fnc, prm) {
-        try {
-            if (undefined === fnc) {
-                /* getter */ 
-                return (undefined === this.m_btnevt) ? null : this.m_btnevt;
-            }
-            /* setter */
-            if ('function' !== typeof fnc) {
+            if (true !== mf.func.isInclude(prm, 'Button')) {
                 throw new Error('invalid parameter');
             }
-            this.m_btnevt = new Array(fnc, prm);
+            
+            let thisobj = this;
+            prm.execOption({
+                size       : new mf.Param('1rem', '0.3rem'),
+                sizeValue  : new mf.Param(
+                    'margin-left',
+                    (0 !== this.button().length) ? '0.3rem' : '0rem'
+                ),
+                clickEvent : new mf.Param(
+                    (tgt, dlg) => {
+                        try {
+                            if (true === dlg.autoClose()) { dlg.visible(false); }
+                        } catch (e) {
+                            console.log(e.stack);
+                            throw e;
+                        }
+                    },
+                    thisobj
+                )
+            });
+            
+            let btn_wrp = this.getFrame().child()[1].child()[0];
+            btn_wrp.width(
+                mf.func.sizeSum(btn_wrp.width(), prm.width())
+            );
+            if (0 !== this.button().length) {
+                btn_wrp.width(
+                    mf.func.sizeSum(btn_wrp.width(), '0.3rem')
+                );
+            }
+            
+            btn_wrp.addChild(prm);
+            
+            if (undefined === this.m_button) {
+                this.m_button = [];
+            }
+            this.m_button.push(prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
