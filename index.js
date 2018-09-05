@@ -9,6 +9,7 @@ const Frame   = require('mofron-comp-frame');
 const Header  = require('mofron-comp-appheader');
 const Text    = require('mofron-comp-text');
 const Button  = require('mofron-comp-button');
+const Click   = require('mofron-event-visiswh');
 const HrzPos  = require('mofron-effect-hrzpos'); 
 const VrtPos  = require('mofron-effect-vrtpos');
 const VisiSwh = require('mofron-event-visiswh');
@@ -211,7 +212,7 @@ mf.comp.Dialog = class extends mf.Component {
                             bind     : false,
                             navigate : new Text({
                                 text  : '&#x2715;',
-                                event : [ new VisiSwh('disable', this) ]
+                                event : [ new Click('disable', this) ]
                             })
                         })
                     );
