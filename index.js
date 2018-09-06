@@ -47,31 +47,36 @@ mf.comp.Dialog = class extends mf.Component {
             super.initDomConts(); 
             
             let btn_ara = new mf.Component({
-                width : '0rem',
-                style : {
-                    'position' : 'absolute',
-                    'bottom'   : '0.2rem'
-                },
-                effect : [ new HrzPos('center') ]
+                width : '100%',
+                child : [
+                    new mf.Component({
+                        width : '0rem',
+                        style : {
+                            'position' : 'absolute',
+                            'bottom'   : '0.2rem'
+                        },
+                        effect : [ new HrzPos('center') ]
+                    })
+                ]
             });
-            this.contents().addChild(btn_ara);
-            this.btnTgt(btn_ara.target());
+            this.btnTgt(btn_ara.child()[0].target());
             
             let frame = this.frame();
             frame.execOption({
                 child : [
                     this.header(),
-                    this.contents()
+                    this.contents(),
+                    btn_ara
                 ]
             });
             
             this.modalfil().execOption({
                 child : [ frame ]
             });
-            
             this.addChild(this.modalfil());
+            
             this.target(this.contents().target());
-            this.styleTgt(this.frame().target());
+            //this.styleTgt(this.frame().target());
             
             /* default size */
             this.size('3.8rem', '2.3rem');
@@ -303,6 +308,19 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    width (prm) {
+        try { return this.frame().width(prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    height (prm) { 
+        try { return this.frame().height(prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
 }
 module.exports = mofron.comp.Dialog;
 /* end of file */
