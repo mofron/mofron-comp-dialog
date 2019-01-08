@@ -1,15 +1,15 @@
 {
   "name": "mofron-comp-dialog",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "dialog component for mofron",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "mofron-comp-ttlframe" : "",
     "mofron-comp-modalfil" : "",
-    "mofron-comp-appheader" : "",
-    "mofron-event-visiswh" : "",
+    "mofron-event-visiclick" : "",
     "mofron-effect-hrzpos" : "",
     "mofron-effect-vrtpos" : ""
   },
@@ -21,7 +21,7 @@
     "front-end"
   ],
   "author": "simparts",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mofron/mofron-comp-dialog/issues"
   },
