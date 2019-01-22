@@ -8,6 +8,7 @@ const Modal   = require('mofron-comp-modalfil');
 const Frame   = require('mofron-comp-ttlframe');
 const Text    = require('mofron-comp-text');
 const Button  = require('mofron-comp-button');
+const Click   = require('mofron-event-click');
 const vsClick = require('mofron-event-visiclick');
 const HrzPos  = require('mofron-effect-hrzpos'); 
 const VrtPos  = require('mofron-effect-vrtpos');
@@ -60,41 +61,20 @@ mf.comp.Dialog = class extends mf.Component {
             /* set close button */
             this.frame().header().child([this.closeButton()]);
             
+            /* set frame contents */
             this.modal().child([this.frame()]);
-            this.child([this.modal(), this.btnWrap()]);
+            let conts = new mf.Component();
+            this.frame().child([conts, this.btnWrap()]);
+            
+            /* set modal */
+            this.child([this.modal()]);
             
             /* update target dom */
-            this.target(this.frame().target());
-            
-            
-            //this.style();
-            //let btn_ara = new mf.Component({
-            //    width : '100%',
-            //    child : [
-            //        new mf.Component({
-            //            width : '0rem', effect : [ new HrzPos('center') ],
-            //            style : {'position': 'absolute', 'bottom': '0.2rem'},
-            //        })
-            //    ]
-            //});
-            //this.btnTgt(btn_ara.child()[0].target());
-            
-            //let frame = this.frame();
-            //frame.execOption({
-            //    child : [
-            //        this.header(),
-            //        this.contents(),
-            //        btn_ara
-            //    ]
-            //});
-            //
-            //this.modalfil().execOption({ child : [ frame ] });
-            //this.addChild(this.modalfil());
-            //
-            //this.target(this.contents().target());
+            this.target(conts.target());
+            this.styleTgt(this.frame().target());
             
             /* default size */
-            this.size('3.8rem', '2.3rem');
+            this.size('3.8rem', '2.8rem');
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -111,7 +91,7 @@ mf.comp.Dialog = class extends mf.Component {
     btnWrap (prm) {
         try {
             if (true === mf.func.isComp(prm)) {
-                prm.execOption({ effect: [new VrtPos('bottom')] });
+                prm.execOption({ effect: [new VrtPos('bottom', '0.3rem'), new HrzPos('center')] });
             }
             return this.innerComp('btnWrap', prm, mf.Component);
         } catch (e) {
@@ -121,18 +101,74 @@ mf.comp.Dialog = class extends mf.Component {
     }
     
     button (prm) {
-        try { return this.btnWrap().child(prm); } catch (e) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                return this.btnWrap().child();
+            }
+            /* setter */
+            if (true === Array.isArray(prm)) {
+                for (let bidx in prm) { 
+                    this.button(prm[bidx]);
+                }
+                return;
+            }
+            let evt = (btn, clk, prm) => {
+                try {
+                    let btn_evt = prm.buttonEvent();
+                    for (let bidx in btn_evt) {
+                        btn_evt[bidx][0](btn, clk, btn_evt[bidx][1]);
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            }
+            prm.execOption({
+                width: '1rem',
+                event: [new Click([evt, this])]
+            });
+            
+            let btn_chd = this.btnWrap().child();
+            if (0 !== btn_chd.length) {
+                prm.execOption({ sizeValue: ['margin-left', '0.2rem'] });
+            }
+            this.btnWrap().child(prm);
+            this.btnWrap().width((btn_chd.length + ((btn_chd.length-1) * 0.2)) + 'rem');
+            
+            return this.btnWrap().child(prm);
+        } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    autoClose (prm) {
-        try { return this.member('autoClose', 'boolean', prm, true); } catch (e) {
+    buttonEvent (fnc, prm) {
+        try {
+            if (undefined === fnc) {
+                /* getter */
+                return (undefined === this.m_btnevt) ? [] : this.m_btnevt;
+            }
+            /* setter */
+            if ('function' !== typeof fnc) {
+                throw new Error('invalid parameter');
+            }
+            if (undefined === this.m_btnevt) {
+                this.m_btnevt = [];
+            }
+            this.m_btnevt.push([fnc, prm]);
+        } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
+    
+    //autoClose (prm) {
+    //    try { return this.member('autoClose', 'boolean', prm, true); } catch (e) {
+    //        console.error(e.stack);
+    //        throw e;
+    //    }
+    //}
     
     closeButton (prm) {
         try {
@@ -151,8 +187,8 @@ mf.comp.Dialog = class extends mf.Component {
             let ret = this.innerComp('frame', prm, Frame);
             if (undefined !== prm) {
                 prm.execOption({
-                    mainColor : [230, 230, 230],
-                    baseColor : [250, 250, 250],
+                    header: new mf.Option({ height: '0.4rem' }),
+                    mainColor : [230, 230, 230], baseColor : 'white',
                     effect    : [ new HrzPos('center'), new VrtPos('center') ],
                 });
             }
