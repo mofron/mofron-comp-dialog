@@ -117,7 +117,7 @@ mf.comp.Dialog = class extends mf.Component {
                 try {
                     let btn_evt = prm.buttonEvent();
                     for (let bidx in btn_evt) {
-                        btn_evt[bidx][0](btn, clk, btn_evt[bidx][1]);
+                        btn_evt[bidx][0](btn, prm, btn_evt[bidx][1]);
                     }
                 } catch (e) {
                     console.error(e.stack);
