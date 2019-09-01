@@ -140,7 +140,7 @@ mf.comp.Dialog = class extends mf.Component {
                 return;
             }
 	    if ('string' === typeof prm) {
-                prm = new Button(prm);
+                prm = new Button({ text: prm, width: "1rem"});
 	    }
             
             if (0 < this.buttonEvent().length) {
@@ -149,13 +149,22 @@ mf.comp.Dialog = class extends mf.Component {
                     prm.clickEvent(btn_evt[bidx][0], btn_evt[bidx][1]);
 		}
 	    }
-
+            
             let btn_chd = this.btnWrap().child();
             if (0 !== btn_chd.length) {
                 prm.option({ sizeValue: ['margin-left', '0.2rem'] });
             }
+            
             this.btnWrap().child(prm);
-            this.btnWrap().width((btn_chd.length + ((btn_chd.length-1) * 0.2)) + 'rem');
+            let wrp_wid = "0rem";
+	    for (let bidx in btn_chd) {
+	        wrp_wid = mf.func.sizeSum(wrp_wid, prm.width());
+	        if (0 == bidx) {
+                    continue;
+		}
+		wrp_wid = mf.func.sizeSum(wrp_wid, "0.2rem");
+            }
+            this.btnWrap().width(wrp_wid);
             
             return this.btnWrap().child(prm);
         } catch (e) {
