@@ -1,0 +1,3 @@
+<Dialog color='#f0e6fa' title="dialog">
+    <button>キャンセル</button>
+</Dialog>

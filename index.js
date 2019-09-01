@@ -1,5 +1,5 @@
 /**
- * @file   mofron-comp-dialog/index.js
+ * @file mofron-comp-dialog/index.js
  * @brief dialog component for mofron
  * @author simpart
  */
@@ -14,16 +14,14 @@ const HrzPos  = require('mofron-effect-hrzpos');
 const VrtPos  = require('mofron-effect-vrtpos');
 const SyncHei = require('mofron-effect-synchei');
 
-/**
- * @class mofron.comp.Dialog
- * @brief dialog component class
- */
 mf.comp.Dialog = class extends mf.Component {
-    
     /**
      * initialize component
      * 
-     * @param po paramter or option
+     * @param (mixed) title parameter
+     *                object: component option
+     * @pmap title
+     * @type private
      */
     constructor (po) {
         try {
@@ -51,12 +49,11 @@ mf.comp.Dialog = class extends mf.Component {
     /**
      * initialize dom contents
      * 
-     * @param prm : 
+     * @type private 
      */
     initDomConts () {
         try {
             super.initDomConts();
-             
             
             /* set close button */
             this.frame().header().child([this.closeButton()]);
@@ -81,6 +78,14 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * dialog title
+     * 
+     * @param (mixed) string: title text
+     *                mofron-comp-text: title text component
+     * @return (mofron-comp-text) title text component
+     * @type parameter
+     */
     title (prm) {
         try { return this.frame().text(prm); } catch (e) {
             console.error(e.stack);
@@ -88,10 +93,23 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * button wrapper
+     * 
+     * @param (component) replace button wrapper
+     * @return (component) buttom wrapper component
+     * @type private
+     */
     btnWrap (prm) {
         try {
             if (true === mf.func.isComp(prm)) {
-                prm.execOption({ effect: [new VrtPos('bottom', '0.3rem'), new HrzPos('center')] });
+                prm.option({
+		    style: { "position" : "absolute" },
+		    effect: [
+		        new VrtPos('bottom', '0.3rem'),
+		        new HrzPos('center')
+		    ]
+		});
             }
             return this.innerComp('btnWrap', prm, mf.Component);
         } catch (e) {
@@ -100,6 +118,14 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * buttom component
+     * 
+     * @param (mixed) string: button text
+     *                mofron-comp-button: dialog button component
+     * @return (mofron-comp-button) dialog button component
+     * @type parameter
+     */
     button (prm) {
         try {
             if (undefined === prm) {
@@ -113,25 +139,20 @@ mf.comp.Dialog = class extends mf.Component {
                 }
                 return;
             }
-            let evt = (btn, clk, prm) => {
-                try {
-                    let btn_evt = prm.buttonEvent();
-                    for (let bidx in btn_evt) {
-                        btn_evt[bidx][0](btn, prm, btn_evt[bidx][1]);
-                    }
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            }
-            prm.execOption({
-                width: '1rem',
-                event: [new Click([evt, this])]
-            });
+	    if ('string' === typeof prm) {
+                prm = new Button(prm);
+	    }
             
+            if (0 < this.buttonEvent().length) {
+                let btn_evt = this.buttonEvent();
+		for (let bidx in btn_evt) {
+                    prm.clickEvent(btn_evt[bidx][0], btn_evt[bidx][1]);
+		}
+	    }
+
             let btn_chd = this.btnWrap().child();
             if (0 !== btn_chd.length) {
-                prm.execOption({ sizeValue: ['margin-left', '0.2rem'] });
+                prm.option({ sizeValue: ['margin-left', '0.2rem'] });
             }
             this.btnWrap().child(prm);
             this.btnWrap().width((btn_chd.length + ((btn_chd.length-1) * 0.2)) + 'rem');
@@ -143,33 +164,36 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * button event
+     *
+     * @param (function) button event
+     * @param (mixed) event parameter
+     * @return (array) [[event,param], ...]
+     * @type parameter
+     */
     buttonEvent (fnc, prm) {
         try {
-            if (undefined === fnc) {
-                /* getter */
-                return (undefined === this.m_btnevt) ? [] : this.m_btnevt;
-            }
-            /* setter */
-            if ('function' !== typeof fnc) {
-                throw new Error('invalid parameter');
-            }
-            if (undefined === this.m_btnevt) {
-                this.m_btnevt = [];
-            }
-            this.m_btnevt.push([fnc, prm]);
+	    if (undefined === fnc) {
+                return this.arrayMember("buttonEvent");
+	    }
+	    if ("function" !== typeof fnc) {
+                throw new Error("invalid parameter");
+	    }
+	    this.arrayMember("buttonEvent", "object", [fnc,prm]);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    //autoClose (prm) {
-    //    try { return this.member('autoClose', 'boolean', prm, true); } catch (e) {
-    //        console.error(e.stack);
-    //        throw e;
-    //    }
-    //}
-    
+    /**
+     * dialog close button
+     * 
+     * @param (component) dialog close component
+     * @reutrn (component) dialog close component
+     * @type parameter
+     */
     closeButton (prm) {
         try {
             if (true === mf.func.isComp(prm)) {
@@ -182,11 +206,19 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * dialog frame
+     * 
+     * @param (mofron-comp-frame) dialog frame component
+     * @return (mofron-comp-frame) dialog frame component
+     * @type parameter
+     */
     frame (prm) {
         try {
             let ret = this.innerComp('frame', prm, Frame);
             if (undefined !== prm) {
-                prm.execOption({
+                prm.option({
+		    style: { "position" : "relative" },
                     header: new mf.Option({ height: '0.4rem' }),
                     mainColor : [230, 230, 230], baseColor : 'white',
                     effect    : [ new HrzPos('center'), new VrtPos('center') ],
@@ -199,6 +231,13 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
+    /**
+     * modal component
+     * 
+     * @param (mofron-comp-modalfil) modal filter component
+     * @return (mofron-comp-modalfil) modal filter component
+     * @type private
+     */
     modal (prm) {
        try { return this.innerComp('modal', prm, Modal);
         } catch (e) {
@@ -207,27 +246,41 @@ mf.comp.Dialog = class extends mf.Component {
         }
     }
     
-    height (prm, hdr) {
-        try {
-            if (undefined !== hdr) { 
-                this.frame().header().height(hdr);
-            }
-            return super.height(prm);
-        } catch (e) {
+    /**
+     * frame header base color
+     * 
+     * @param (mixed) string: color name, #hex
+     *                array: [red, green, blue, (alpha)]
+     * @param (option) style option
+     * @type parameter
+     */
+    mainColor (prm, opt) {
+        try { return this.frame().header().baseColor(prm,opt); } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    mainColor (prm) {
-        try { return this.frame().header().baseColor(prm); } catch (e) {
+    /**
+     * modal base color
+     * 
+     * @param (mixed) string: color name, #hex
+     *                array: [red, green, blue, (alpha)]
+     * @param (option) style option
+     * @type parameter
+     */
+    accentColor (prm, opt) {
+        try { return this.modal().baseColor(prm,opt); } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    accentColor (prm) {
-        try { return this.modal().baseColor(prm); } catch (e) {
+    /**
+     * @type private
+     */
+    visible (flg, cb) {
+        try { return this.modal().visible(flg, cb); } catch (e) {
             console.error(e.stack);
             throw e;
         }
