@@ -12,7 +12,7 @@ npm install mofron mofron-comp-dialog
 # Sample
 ```html
 <Dialog color='#f0e6fa' title="dialog">
-    <button>キャンセル</button>
+    <button>OK</button>
 </Dialog>
 ```
 # Parameter
