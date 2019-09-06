@@ -72,6 +72,7 @@ mf.comp.Dialog = class extends mf.Component {
             
             /* default size */
             this.size('3.8rem', '2.8rem');
+	    this.btnWrap().width('3.8rem'); // for hrzpos
         } catch (e) {
             console.error(e.stack);
             throw e;
