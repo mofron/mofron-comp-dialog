@@ -3,6 +3,8 @@
 
 dialog component for mofron
 
+modal dialog, but hide when clicking outside the dialog
+
 
 # Install
 ```
@@ -33,4 +35,6 @@ npm install mofron mofron-comp-dialog
 | | accentColor | mixed | string: color name, #hex |
 | | | | array: [red, green, blue, (alpha)] |
 | | | option | style option |
+| | height | string (size) | dialog height |
+| | innerHeight | string (size) | dialog inner height |
 

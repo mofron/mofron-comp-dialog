@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-dialog",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "dialog component for mofron",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "mofron-comp-ttlframe" : "",
     "mofron-comp-modalfil" : "",
     "mofron-comp-button"   : "",
+    "mofron-event-clkfocus": "",
     "mofron-event-visiclick" : "",
     "mofron-effect-hrzpos" : "",
     "mofron-effect-vrtpos" : "",

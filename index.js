@@ -1,6 +1,7 @@
 /**
  * @file mofron-comp-dialog/index.js
  * @brief dialog component for mofron
+ *        modal dialog, but hide when clicking outside the dialog
  * @author simpart
  */
 const mf      = require('mofron');
@@ -9,6 +10,7 @@ const Frame   = require('mofron-comp-ttlframe');
 const Text    = require('mofron-comp-text');
 const Button  = require('mofron-comp-button');
 const Click   = require('mofron-event-click');
+const ClkFcs  = require('mofron-event-clkfocus');
 const vsClick = require('mofron-event-visiclick');
 const HrzPos  = require('mofron-effect-hrzpos'); 
 const VrtPos  = require('mofron-effect-vrtpos');
@@ -31,8 +33,9 @@ mf.comp.Dialog = class extends mf.Component {
             
             this.closeButton(
                 new Text({
-                    text: '&times;', mainColor: [120,120,120],
-                    effect: [
+		    style  : [{ "font-family" : "auto" }, { locked: true }],
+                    text   : '&times;', mainColor: [120,120,120],
+                    effect : [
                         new SyncHei(this.frame().header()),
                         new HrzPos('right', '0.1rem')
                     ]
@@ -60,7 +63,7 @@ mf.comp.Dialog = class extends mf.Component {
             
             /* set frame contents */
             this.modal().child([this.frame()]);
-            let conts = new mf.Component();
+            let conts = new mf.Component({ width: "100%" });
             this.frame().child([conts, this.btnWrap()]);
             
             /* set modal */
@@ -109,7 +112,8 @@ mf.comp.Dialog = class extends mf.Component {
 		    effect: [
 		        new VrtPos('bottom', '0.3rem'),
 		        new HrzPos('center')
-		    ]
+		    ],
+		    visible: false
 		});
             }
             return this.innerComp('btnWrap', prm, mf.Component);
@@ -134,6 +138,7 @@ mf.comp.Dialog = class extends mf.Component {
                 return this.btnWrap().child();
             }
             /* setter */
+	    this.btnWrap().visible(true);
             if (true === Array.isArray(prm)) {
                 for (let bidx in prm) { 
                     this.button(prm[bidx]);
@@ -207,7 +212,7 @@ mf.comp.Dialog = class extends mf.Component {
     closeButton (prm) {
         try {
             if (true === mf.func.isComp(prm)) {
-                prm.execOption({ event: [new vsClick('disable',this)] });
+                prm.option({ event: [new vsClick('disable',this)] });
             }
             return this.innerComp('closeButton', prm, mf.Component);
         } catch (e) {
@@ -227,11 +232,23 @@ mf.comp.Dialog = class extends mf.Component {
         try {
             let ret = this.innerComp('frame', prm, Frame);
             if (undefined !== prm) {
+	        let fcs = (fcs1,fcs2,fcs3) => {
+                    try {
+			if (false === fcs2) {
+                            fcs3.visible(false);
+			}
+		    } catch (e) {
+		        console.error(e.stack);
+                        throw e;
+		    }
+		}
                 prm.option({
-		    style: { "position" : "relative" },
-                    header: new mf.Option({ height: '0.4rem' }),
+		    style     : { "position" : "relative" },
+                    header    : new mf.Option({ height: '0.4rem' }),
                     mainColor : [230, 230, 230], baseColor : 'white',
+		    event     : [ new ClkFcs({ handler: [fcs,this], pointer: false, tag: "Dialog" }) ],
                     effect    : [ new HrzPos('center'), new VrtPos('center') ],
+		    visible   : false 
                 });
             }
             return ret;
@@ -287,10 +304,77 @@ mf.comp.Dialog = class extends mf.Component {
     }
     
     /**
+     * set effect to frame component
+     * @type private
+     */
+    effect (prm) {
+        try {
+            return this.frame().effect(prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * dialog height
+     * 
+     * @param (string (size)) dialog height
+     * @return (string (size)) dialog height
+     * @type parameter
+     */
+    height (prm, opt) {
+        try {
+	    if (undefined !== prm) {
+		let inn = prm;
+		try {
+                    inn = mf.func.sizeDiff(prm, this.frame().header().height());
+		} catch (e) {}
+		this.innerHeight(inn);
+	    }
+            return super.height(prm,opt);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * dialog inner height
+     * 
+     * @param (string (size)) dialog inner height
+     * @return (string (size)) dialog inner height
+     * @type parameter
+     */
+    innerHeight (prm) {
+        try {
+	    return this.target().style({ "height" : prm });
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * modal filter, dialog frame visible
+     * 
      * @type private
      */
     visible (flg, cb) {
-        try { return this.modal().visible(flg, cb); } catch (e) {
+        try {
+	    let ret = this.modal().visible(flg, cb);
+            let fcs = this.frame().event(["ClkFocus","Dialog"]);
+            this.frame().visible(
+	        flg,
+		() => {
+		    try { fcs.focusSts(flg); } catch (e) {
+		        console.error(e.stack);
+                        throw e;
+		    }
+		}
+	    );
+	    return ret;
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
