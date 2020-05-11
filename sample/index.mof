@@ -1,3 +1,20 @@
-<Dialog color='#f0e6fa' title="dialog">
+<setting>
+    <tag load="mofron-comp-dialog">Dialog</tag>
+</setting>
+
+<script run=after>
+dlg.visible(true);
+</script>
+
+<script run=init>
+let btn_evt = (b1,b2,b3) => {
+    console.log(b1.text().text());
+    dlg.visible(false);
+}
+</script>
+
+<Dialog name=dlg size=(3rem,3rem) button-event=@btn_evt>
+    <title>"Dialog"</title>
     <button>OK</button>
+    <button>Cancel</button>
 </Dialog>

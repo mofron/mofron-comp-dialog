@@ -13,21 +13,39 @@ npm install mofron mofron-comp-dialog
 
 # Sample
 ```html
-<Dialog color='#f0e6fa' title="dialog">
+<setting>
+    <tag load="mofron-comp-dialog">Dialog</tag>
+</setting>
+
+<script run=after>
+dlg.visible(true);
+</script>
+
+<script run=init>
+let btn_evt = (b1,b2,b3) => {
+    console.log(b1.text().text());
+    dlg.visible(false);
+}
+</script>
+
+<Dialog name=dlg size=(3rem,3rem) button-event=@btn_evt>
+    <title>"Dialog"</title>
     <button>OK</button>
+    <button>Cancel</button>
 </Dialog>
 ```
+
 # Parameter
 
-|Simple<br>Param | Parameter Name | Type | Description |
-|:--------------:|:---------------|:-----|:------------|
+| Short<br>Form | Parameter Name | Type | Description |
+|:-------------:|:---------------|:-----|:------------|
 | ◯  | title | mixed | string: title text |
 | | | | mofron-comp-text: title text component |
 | | button | mixed | string: button text |
 | | | | mofron-comp-button: dialog button component |
 | | buttonEvent | function | button event |
 | | | mixed | event parameter |
-| | closeButton | component | dialog close component |
+| | closeComp | component | dialog close component |
 | | frame | mofron-comp-frame | dialog frame component |
 | | mainColor | mixed | string: color name, #hex |
 | | | | array: [red, green, blue, (alpha)] |
@@ -36,5 +54,7 @@ npm install mofron mofron-comp-dialog
 | | | | array: [red, green, blue, (alpha)] |
 | | | option | style option |
 | | height | string (size) | dialog height |
-| | innerHeight | string (size) | dialog inner height |
+| | | | undefined: call as getter |
+| | width | string (size) | dialog width |
+| | | | undefined: call as getter |
 

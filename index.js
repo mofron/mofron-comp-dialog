@@ -4,7 +4,6 @@
  *        modal dialog, but hide when clicking outside the dialog
  * @author simpart
  */
-const mf      = require('mofron');
 const Modal   = require('mofron-comp-modalfil');
 const Frame   = require('mofron-comp-ttlframe');
 const Text    = require('mofron-comp-text');
@@ -15,34 +14,29 @@ const vsClick = require('mofron-event-visiclick');
 const HrzPos  = require('mofron-effect-hrzpos'); 
 const VrtPos  = require('mofron-effect-vrtpos');
 const SyncHei = require('mofron-effect-synchei');
+const SyncWid = require('mofron-effect-syncwid');
+const comutl  = mofron.util.common;
 
-mf.comp.Dialog = class extends mf.Component {
+module.exports = class extends mofron.class.Component {
     /**
      * initialize component
      * 
      * @param (mixed) title parameter
      *                object: component option
-     * @pmap title
+     * @short title
      * @type private
      */
-    constructor (po) {
+    constructor (p1) {
         try {
             super();
             this.name('Dialog');
-            this.prmMap('title');
+            this.shortForm('title');
             
-            this.closeButton(
-                new Text({
-		    style  : [{ "font-family" : "auto" }, { locked: true }],
-                    text   : '&times;', mainColor: [120,120,120],
-                    effect : [
-                        new SyncHei(this.frame().header()),
-                        new HrzPos('right', '0.1rem')
-                    ]
-                })
-            );
+            this.confmng().add("buttonEvent", { type: "event", list: true });
             
-            this.prmOpt(po);
+            if (0 < arguments.length) {
+                this.config(p1);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -52,31 +46,60 @@ mf.comp.Dialog = class extends mf.Component {
     /**
      * initialize dom contents
      * 
-     * @type private 
+     * @type private
      */
     initDomConts () {
         try {
-            super.initDomConts();
+	    /* init inner comp */
+	    this.frame(new Frame());
+	    this.btnWrap(new mofron.class.Component());
+            this.modalfil(new Modal());
             
+            super.initDomConts();
+
             /* set close button */
-            this.frame().header().child([this.closeButton()]);
+            this.closeComp(
+                new Text({
+                    style : new mofron.class.ConfArg({ "font-family" : "auto" }, { locked: true }),
+                    text  : '&times;', mainColor: [120,120,120],
+                })
+            );
+            this.frame().header().child(this.closeComp());
             
             /* set frame contents */
-            this.modal().child([this.frame()]);
-            let conts = new mf.Component({ width: "100%" });
+            this.modalfil().child(this.frame());
+            let conts = new mofron.class.Component({ width: "100%" });
             this.frame().child([conts, this.btnWrap()]);
             
             /* set modal */
-            this.child([this.modal()]);
+            this.child([this.modalfil()]);
             
             /* update target dom */
-            this.target(conts.target());
-            this.styleTgt(this.frame().target());
+            this.childDom(conts.childDom());
+            this.styleDom(this.frame().childDom());
             
             /* default size */
             this.size('3.8rem', '2.8rem');
-	    this.btnWrap().width('3.8rem'); // for hrzpos
         } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+
+    beforeRender () {
+        try {
+            super.beforeRender();
+            /* set button event */
+	    let btn  = this.button();
+	    let bevt = this.buttonEvent();
+	    if ( (0 < bevt.length) && (0 < btn.length) ) {
+	        for (let bidx in btn) {
+	            for (let eidx in bevt) {
+                        btn[bidx].clickEvent(bevt[eidx][0], bevt[eidx][1]);
+                    }
+	        }
+	    }
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -91,7 +114,14 @@ mf.comp.Dialog = class extends mf.Component {
      * @type parameter
      */
     title (prm) {
-        try { return this.frame().text(prm); } catch (e) {
+        try {
+	    let ret = this.frame().text(prm);
+            if ( (undefined !== prm) &&
+                 (null === this.frame().text().style("margin-left")) ) {
+                this.frame().text().style({ "margin-left" : "0.2rem" });
+            }
+            return ret;
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -106,17 +136,19 @@ mf.comp.Dialog = class extends mf.Component {
      */
     btnWrap (prm) {
         try {
-            if (true === mf.func.isComp(prm)) {
-                prm.option({
-		    style: { "position" : "absolute" },
+            if (true === comutl.iscmp(prm)) {
+                prm.config({
+		    style: {
+		        "position" : "absolute",
+			"display"  : "none"
+                    },
 		    effect: [
 		        new VrtPos('bottom', '0.3rem'),
 		        new HrzPos('center')
-		    ],
-		    visible: false
+		    ]
 		});
             }
-            return this.innerComp('btnWrap', prm, mf.Component);
+            return this.innerComp('btnWrap', prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -138,7 +170,7 @@ mf.comp.Dialog = class extends mf.Component {
                 return this.btnWrap().child();
             }
             /* setter */
-	    this.btnWrap().visible(true);
+	    this.btnWrap().style({ "display" : "flex" });
             if (true === Array.isArray(prm)) {
                 for (let bidx in prm) { 
                     this.button(prm[bidx]);
@@ -146,33 +178,12 @@ mf.comp.Dialog = class extends mf.Component {
                 return;
             }
 	    if ('string' === typeof prm) {
-                prm = new Button({ text: prm, width: "1rem"});
+                prm = new Button({ text: prm, width: "1rem" });
 	    }
-            
-            if (0 < this.buttonEvent().length) {
-                let btn_evt = this.buttonEvent();
-		for (let bidx in btn_evt) {
-                    prm.clickEvent(btn_evt[bidx][0], btn_evt[bidx][1]);
-		}
-	    }
-            
-            let btn_chd = this.btnWrap().child();
-            if (0 !== btn_chd.length) {
-                prm.option({ sizeValue: ['margin-left', '0.2rem'] });
+            if (0 !== this.button().length) {
+                prm.style({ 'margin-left' : '0.2rem' });
             }
-            
             this.btnWrap().child(prm);
-            let wrp_wid = "0rem";
-	    for (let bidx in btn_chd) {
-	        wrp_wid = mf.func.sizeSum(wrp_wid, prm.width());
-	        if (0 == bidx) {
-                    continue;
-		}
-		wrp_wid = mf.func.sizeSum(wrp_wid, "0.2rem");
-            }
-            this.btnWrap().width(wrp_wid);
-            
-            return this.btnWrap().child(prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -189,13 +200,7 @@ mf.comp.Dialog = class extends mf.Component {
      */
     buttonEvent (fnc, prm) {
         try {
-	    if (undefined === fnc) {
-                return this.arrayMember("buttonEvent");
-	    }
-	    if ("function" !== typeof fnc) {
-                throw new Error("invalid parameter");
-	    }
-	    this.arrayMember("buttonEvent", "object", [fnc,prm]);
+	    return this.confmng("buttonEvent", fnc, prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -203,18 +208,25 @@ mf.comp.Dialog = class extends mf.Component {
     }
     
     /**
-     * dialog close button
+     * close component in header
      * 
      * @param (component) dialog close component
      * @reutrn (component) dialog close component
      * @type parameter
      */
-    closeButton (prm) {
+    closeComp (prm) {
         try {
-            if (true === mf.func.isComp(prm)) {
-                prm.option({ event: [new vsClick('disable',this)] });
+            if (true === comutl.iscmp(prm)) {
+	        let vsclk = new vsClick('disable',this);
+                prm.config({
+                    event  : new vsClick('disable',this),
+                    effect : [
+                        new SyncHei(this.frame().header()),
+                        new HrzPos('right', '0.1rem')
+                    ]
+                });
             }
-            return this.innerComp('closeButton', prm, mf.Component);
+            return this.innerComp('closeComp', prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -230,7 +242,7 @@ mf.comp.Dialog = class extends mf.Component {
      */
     frame (prm) {
         try {
-            let ret = this.innerComp('frame', prm, Frame);
+            let ret = this.innerComp('frame', prm);
             if (undefined !== prm) {
 	        let fcs = (fcs1,fcs2,fcs3) => {
                     try {
@@ -242,13 +254,15 @@ mf.comp.Dialog = class extends mf.Component {
                         throw e;
 		    }
 		}
-                prm.option({
-		    style     : { "position" : "relative" },
-                    header    : new mf.Option({ height: '0.4rem' }),
+                prm.config({
+		    style     : { "position" : "relative", "display" : "none" },
+                    header    : new mofron.class.PullConf({ height: '0.4rem' }),
                     mainColor : [230, 230, 230], baseColor : 'white',
-		    event     : [ new ClkFcs({ handler: [fcs,this], pointer: false, tag: "Dialog" }) ],
+		    event     : new ClkFcs({
+                                    listener: new mofron.class.ConfArg(fcs,this),
+                                    pointer: false, tag: "Dialog"
+                                }),
                     effect    : [ new HrzPos('center'), new VrtPos('center') ],
-		    visible   : false 
                 });
             }
             return ret;
@@ -259,15 +273,16 @@ mf.comp.Dialog = class extends mf.Component {
     }
     
     /**
-     * modal component
+     * modalfilter component
      * 
      * @param (mofron-comp-modalfil) modal filter component
      * @return (mofron-comp-modalfil) modal filter component
      * @type private
      */
-    modal (prm) {
-       try { return this.innerComp('modal', prm, Modal);
-        } catch (e) {
+    modalfil (prm) {
+       try {
+           return this.innerComp('modalfil', prm);
+       } catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -282,7 +297,9 @@ mf.comp.Dialog = class extends mf.Component {
      * @type parameter
      */
     mainColor (prm, opt) {
-        try { return this.frame().header().baseColor(prm,opt); } catch (e) {
+        try {
+	    return this.frame().header().baseColor(prm,opt);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -297,7 +314,9 @@ mf.comp.Dialog = class extends mf.Component {
      * @type parameter
      */
     accentColor (prm, opt) {
-        try { return this.modal().baseColor(prm,opt); } catch (e) {
+        try {
+	    return this.modalfil().baseColor(prm,opt);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -320,19 +339,13 @@ mf.comp.Dialog = class extends mf.Component {
      * dialog height
      * 
      * @param (string (size)) dialog height
+     *                        undefined: call as getter
      * @return (string (size)) dialog height
      * @type parameter
      */
     height (prm, opt) {
         try {
-	    if (undefined !== prm) {
-		let inn = prm;
-		try {
-                    inn = mf.func.sizeDiff(prm, this.frame().header().height());
-		} catch (e) {}
-		this.innerHeight(inn);
-	    }
-            return super.height(prm,opt);
+            return this.frame().height(prm,opt);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -340,15 +353,16 @@ mf.comp.Dialog = class extends mf.Component {
     }
     
     /**
-     * dialog inner height
+     * dialog width
      * 
-     * @param (string (size)) dialog inner height
-     * @return (string (size)) dialog inner height
+     * @param (string (size)) dialog width
+     *                        undefined: call as getter
+     * @return (string (size)) dialog height
      * @type parameter
      */
-    innerHeight (prm) {
+    width (prm, opt) {
         try {
-	    return this.target().style({ "height" : prm });
+            return this.frame().width(prm,opt);
 	} catch (e) {
             console.error(e.stack);
             throw e;
@@ -362,23 +376,28 @@ mf.comp.Dialog = class extends mf.Component {
      */
     visible (flg, cb) {
         try {
-	    let ret = this.modal().visible(flg, cb);
-            let fcs = this.frame().event(["ClkFocus","Dialog"]);
-            this.frame().visible(
-	        flg,
-		() => {
-		    try { fcs.focusSts(flg); } catch (e) {
-		        console.error(e.stack);
-                        throw e;
-		    }
-		}
-	    );
-	    return ret;
+	    if (undefined === flg) {
+                /* getter */
+                return this.modalfil().visible();
+	    }
+	    /* setter */
+	    let dlg = this;
+	    let fcs = this.frame().event({ name: "ClkFocus", tag: "Dialog" });
+            if (true === flg) {
+                this.modalfil().visible(flg, () => {
+		    dlg.frame().visible(flg,cb);
+		    fcs.status(flg);
+		});
+	    } else {
+                this.frame().visible(flg, () => {
+                    dlg.modalfil().visible(flg,cb);
+		    fcs.status(flg);
+		});
+	    }
 	} catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 }
-module.exports = mofron.comp.Dialog;
 /* end of file */
