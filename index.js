@@ -68,7 +68,7 @@ module.exports = class extends mofron.class.Component {
             
             /* set frame contents */
             this.modalfil().child(this.frame());
-            let conts = new mofron.class.Component({ width: "100%" });
+            let conts = new mofron.class.Component({ effect: new SyncWid(this.frame()) });
             this.frame().child([conts, this.btnWrap()]);
             
             /* set modal */
@@ -79,13 +79,19 @@ module.exports = class extends mofron.class.Component {
             this.styleDom(this.frame().childDom());
             
             /* default size */
-            this.size('3.8rem', '2.8rem');
+            this.size('4rem', '3rem');
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
+    
 
+    /**
+     * set button event
+     * 
+     * @type private
+     */
     beforeRender () {
         try {
             super.beforeRender();
@@ -163,7 +169,7 @@ module.exports = class extends mofron.class.Component {
      * @return (mofron-comp-button) dialog button component
      * @type parameter
      */
-    button (prm) {
+    button (prm, opt) {
         try {
             if (undefined === prm) {
                 /* getter */
@@ -173,7 +179,7 @@ module.exports = class extends mofron.class.Component {
 	    this.btnWrap().style({ "display" : "flex" });
             if (true === Array.isArray(prm)) {
                 for (let bidx in prm) { 
-                    this.button(prm[bidx]);
+                    this.button(prm[bidx], opt);
                 }
                 return;
             }
@@ -183,6 +189,9 @@ module.exports = class extends mofron.class.Component {
             if (0 !== this.button().length) {
                 prm.style({ 'margin-left' : '0.2rem' });
             }
+	    if (undefined !== opt) {
+                prm.config(opt);
+	    }
             this.btnWrap().child(prm);
         } catch (e) {
             console.error(e.stack);
@@ -260,7 +269,8 @@ module.exports = class extends mofron.class.Component {
                     mainColor : [230, 230, 230], baseColor : 'white',
 		    event     : new ClkFcs({
                                     listener: new mofron.class.ConfArg(fcs,this),
-                                    pointer: false, tag: "Dialog"
+                                    pointer: false, tag: "Dialog",
+				    suspend: true
                                 }),
                     effect    : [ new HrzPos('center'), new VrtPos('center') ],
                 });
@@ -340,6 +350,7 @@ module.exports = class extends mofron.class.Component {
      * 
      * @param (string (size)) dialog height
      *                        undefined: call as getter
+     * @param (dict) set size option
      * @return (string (size)) dialog height
      * @type parameter
      */
@@ -350,6 +361,24 @@ module.exports = class extends mofron.class.Component {
             console.error(e.stack);
             throw e;
         }
+    }
+    
+    /**
+     * dialog header height
+     * 
+     * @param (string(size)) header height
+     *                       undefined: call as getter
+     * @param (dict) set size option
+     * @return (string(size)) dialog header height
+     * @type parameter
+     */
+    headerHeight (prm, opt) {
+        try {
+            return this.frame().header().height(prm, opt);
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+	}
     }
     
     /**

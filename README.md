@@ -55,6 +55,10 @@ let btn_evt = (b1,b2,b3) => {
 | | | option | style option |
 | | height | string (size) | dialog height |
 | | | | undefined: call as getter |
+| | | dict | set size option |
+| | headerHeight | string(size) | header height |
+| | | | undefined: call as getter |
+| | | dict | set size option |
 | | width | string (size) | dialog width |
 | | | | undefined: call as getter |
 
