@@ -41,8 +41,10 @@ let btn_evt = (b1,b2,b3) => {
 |:-------------:|:---------------|:-----|:------------|
 | ◯  | title | mixed | string: title text |
 | | | | mofron-comp-text: title text component |
+| | | dict | text config |
 | | button | mixed | string: button text |
 | | | | mofron-comp-button: dialog button component |
+| | | dict | button config  |
 | | buttonEvent | function | button event |
 | | | mixed | event parameter |
 | | closeComp | component | dialog close component |

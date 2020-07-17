@@ -116,15 +116,17 @@ module.exports = class extends mofron.class.Component {
      * 
      * @param (mixed) string: title text
      *                mofron-comp-text: title text component
+     * @param (dict) text config
      * @return (mofron-comp-text) title text component
      * @type parameter
      */
-    title (prm) {
+    title (prm, cnf) {
         try {
 	    let ret = this.frame().text(prm);
             if ( (undefined !== prm) &&
                  (null === this.frame().text().style("margin-left")) ) {
                 this.frame().text().style({ "margin-left" : "0.2rem" });
+		this.frame().text().config(cnf);
             }
             return ret;
 	} catch (e) {
@@ -166,6 +168,7 @@ module.exports = class extends mofron.class.Component {
      * 
      * @param (mixed) string: button text
      *                mofron-comp-button: dialog button component
+     * @param (dict) button config 
      * @return (mofron-comp-button) dialog button component
      * @type parameter
      */

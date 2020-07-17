@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-dialog",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "dialog component for mofron",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "mofron-event-visiclick" : "",
     "mofron-effect-hrzpos" : "",
     "mofron-effect-vrtpos" : "",
-    "mofron-effect-synchei": ""
+    "mofron-effect-synchei": "",
+    "mofron-effect-syncwid" : ""
   },
   "repository": {
     "type": "git",
