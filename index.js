@@ -29,7 +29,7 @@ module.exports = class extends mofron.class.Component {
     constructor (p1) {
         try {
             super();
-            this.name('Dialog');
+            this.modname('Dialog');
             this.shortForm('title');
             
             this.confmng().add("buttonEvent", { type: "event", list: true });
