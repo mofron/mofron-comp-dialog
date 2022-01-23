@@ -87,6 +87,7 @@ module.exports = class extends mofron.class.Component {
             
             /* default size */
             this.size('4rem', '3rem');
+	    this.visible(false);
         } catch (e) {
             console.error(e.stack);
             throw e;
