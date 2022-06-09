@@ -248,7 +248,7 @@ module.exports = class extends mofron.class.Component {
                     event  : new vsClick('disable',this),
                     effect : [
                         new SyncHei(this.frame().header()),
-                        new HrzPos('right', '0.1rem')
+                        new HrzPos('right', '0.15rem')
                     ]
                 });
             }
@@ -471,11 +471,11 @@ module.exports = class extends mofron.class.Component {
                 return this.modalfil().visible();
 	    }
 	    /* setter */
-	    let fcs = this.frame().event({ name: "ClkFocus", tag: "Dialog" });
+	    let fcs = this.frame().event({ modname: "ClkFocus", tag: "Dialog" });
             if (true === flg) {
 	        let opn_evt = this.openEvent();
 		for (let oidx in opn_evt) {
-                    opn_evt[oidx][0](opn_evt[oidx][1]);
+                    opn_evt[oidx][0](this, null, opn_evt[oidx][1]);
 		}
                 
 	        this.modalfil().visible(flg);
@@ -484,7 +484,7 @@ module.exports = class extends mofron.class.Component {
 	    } else {
 	        let cls_evt = this.closeEvent();
 		for (let oidx in cls_evt) {
-                    cls_evt[oidx][0](cls_evt[oidx][1]);
+                    cls_evt[oidx][0](this, null, cls_evt[oidx][1]);
 		}
 
                 this.frame().visible(flg);
