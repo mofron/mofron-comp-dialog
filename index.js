@@ -75,7 +75,9 @@ module.exports = class extends mofron.class.Component {
             
             /* set frame contents */
             this.modalfil().child(this.frame());
-            let conts = new mofron.class.Component({ effect: new SyncWid(this.frame()) });
+            let conts = new mofron.class.Component({
+	                    effect: new SyncWid(this.frame()),
+		        });
             this.frame().child([conts, this.btnWrap()]);
             
             /* set modal */
@@ -243,9 +245,9 @@ module.exports = class extends mofron.class.Component {
     closeComp (prm) {
         try {
             if (true === comutl.iscmp(prm)) {
-	        let vsclk = new vsClick('disable',this);
+	        let vsclk = new vsClick(false,this);
                 prm.config({
-                    event  : new vsClick('disable',this),
+                    event  : new vsClick(false,this),
                     effect : [
                         new SyncHei(this.frame().header()),
                         new HrzPos('right', '0.15rem')
