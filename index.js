@@ -71,6 +71,7 @@ module.exports = class extends mofron.class.Component {
                     text  : '&times;', mainColor: [120,120,120],
                 })
             );
+	    this.frame().header().bind(true);
             this.frame().header().child(this.closeComp());
             
             /* set frame contents */
@@ -488,7 +489,6 @@ module.exports = class extends mofron.class.Component {
 		for (let oidx in cls_evt) {
                     cls_evt[oidx][0](this, null, cls_evt[oidx][1]);
 		}
-
                 this.frame().visible(flg);
 		this.modalfil().visible(flg,cb);
 	        fcs.status(flg);
