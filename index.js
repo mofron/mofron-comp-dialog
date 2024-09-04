@@ -76,9 +76,7 @@ module.exports = class extends mofron.class.Component {
             
             /* set frame contents */
             this.modalfil().child(this.frame());
-            let conts = new mofron.class.Component({
-	                    effect: new SyncWid(this.frame()),
-		        });
+            let conts = new mofron.class.Component();
             this.frame().child([conts, this.btnWrap()]);
             
             /* set modal */
